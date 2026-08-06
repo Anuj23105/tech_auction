@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Team Bidding Panel – Smart City Auction</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="team.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body class="team-body">
+
+  <!-- SELECT TEAM SCREEN -->
+  <div id="tp-select" class="tp-screen active">
+    <div class="tp-select-box">
+      <div class="tp-logo">🏙️</div>
+      <h1>Smart City Auction</h1>
+      <p class="tp-sub">Select your team to join the bidding</p>
+      <div id="tp-team-buttons" class="tp-team-buttons">
+        <p class="tp-waiting">Waiting for host to start the game…</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- BIDDING SCREEN -->
+  <div id="tp-bid" class="tp-screen">
+    <!-- Header -->
+    <div class="tp-header">
+      <div class="tp-header-left">
+        <span class="tp-team-name" id="tp-myName">Team A</span>
+        <span class="tp-role-badge">BIDDER</span>
+      </div>
+      <div class="tp-header-center">
+        <span class="tp-item-num" id="tp-itemNum">Item 1/38</span>
+      </div>
+      <div class="tp-header-right">
+        <span class="tp-budget-label">Budget</span>
+        <span class="tp-budget-val" id="tp-budget">₹10 Cr</span>
+      </div>
+    </div>
+
+    <!-- Ticker -->
+    <div class="ticker-wrap">
+      <div class="ticker">
+        💰 Bid wisely – every rupee counts &nbsp;|&nbsp;
+        🛡️ Don't skip Firewall &nbsp;|&nbsp;
+        ☀️ Renewable energy scores bonus points &nbsp;|&nbsp;
+        🚦 Smart Traffic helps in Heavy Traffic events &nbsp;
+      </div>
+    </div>
+
+    <!-- Event Banner -->
+    <div id="tp-event" class="tp-event hidden"></div>
+
+    <!-- Main -->
+    <div class="tp-main">
+      <!-- Current Item -->
+      <div class="tp-item-card" id="tp-itemCard">
+        <div class="tp-item-badge" id="tp-cat">Networking</div>
+        <div class="tp-item-emoji" id="tp-emoji">🔌</div>
+        <div class="tp-item-name" id="tp-name">Enterprise Router</div>
+        <div class="tp-item-desc" id="tp-desc">Core routing for entire city network</div>
+        <div class="tp-price-row">
+          <span class="tp-base">Base: <b id="tp-base">₹40 L</b></span>
+        </div>
+        <div class="tp-live-bid">
+          <div class="tp-live-label">LIVE BID</div>
+          <div class="tp-live-amount" id="tp-liveBid">₹40 L</div>
+          <div class="tp-live-bidder" id="tp-liveBidder">No bids yet</div>
+        </div>
+      </div>
+
+      <!-- Bid Panel -->
+      <div class="tp-bid-panel" id="tp-bidPanel">
+        <div class="tp-bid-title">Place Your Bid</div>
+        <div class="tp-bid-row">
+          <button class="tp-step" onclick="tpAdjust(-10)">−</button>
+          <div class="tp-bid-input-wrap">
+            <input type="number" id="tp-bidInput" value="40" min="1"/>
+            <span class="tp-unit">Lakhs</span>
+          </div>
+          <button class="tp-step" onclick="tpAdjust(10)">+</button>
+        </div>
+        <div class="tp-quick-btns">
+          <button onclick="tpSetBid(50)">₹50L</button>
+          <button onclick="tpSetBid(100)">₹1Cr</button>
+          <button onclick="tpSetBid(200)">₹2Cr</button>
+          <button onclick="tpSetBid(500)">₹5Cr</button>
+        </div>
+        <button class="tp-btn-bid" id="tp-submitBid" onclick="tpPlaceBid()">
+          🔨 Place Bid
+        </button>
+        <div class="tp-bid-hint" id="tp-hint">Minimum bid: base price</div>
+        <div class="tp-sold-msg hidden" id="tp-soldMsg">✅ SOLD – waiting for next item…</div>
+        <div class="tp-wait-msg hidden" id="tp-waitMsg">⏳ Game not started yet</div>
+      </div>
+    </div>
+
+    <!-- My Inventory (collapsible) -->
+    <div class="tp-inventory">
+      <div class="tp-inv-header" onclick="toggleInv()">
+        🎒 My Inventory <span id="tp-invCount">(0 items)</span>
+        <span class="tp-inv-toggle" id="tp-invToggle">▼</span>
+      </div>
+      <div id="tp-invList" class="tp-inv-list hidden"></div>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="shared.js"></script>
+  <script src="team.js"></script>
+</body>
+</html>

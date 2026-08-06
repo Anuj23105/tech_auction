@@ -1,0 +1,81 @@
+/* ===== TEAM PANEL ===== */
+.team-body { background: var(--bg); min-height: 100vh; }
+.tp-screen { display: none; min-height: 100vh; flex-direction: column; }
+.tp-screen.active { display: flex; }
+
+/* Select screen */
+.tp-select-box { margin: auto; text-align: center; padding: 2rem; max-width: 500px; width: 100%; }
+.tp-logo { font-size: 5rem; filter: drop-shadow(0 0 20px #00d4ff); margin-bottom: 1rem; }
+.tp-select-box h1 { font-family: 'Orbitron', sans-serif; color: var(--accent); font-size: 1.8rem; margin-bottom: .5rem; }
+.tp-sub { color: var(--muted); margin-bottom: 2rem; font-size: 1rem; }
+.tp-team-buttons { display: flex; flex-direction: column; gap: .8rem; }
+.tp-join-btn { background: var(--card); border: 2px solid var(--accent); color: var(--text); padding: 1rem 2rem; border-radius: var(--radius); font-size: 1.2rem; font-weight: 700; cursor: pointer; font-family: 'Rajdhani', sans-serif; transition: all .2s; }
+.tp-join-btn:hover { background: rgba(0,212,255,.1); transform: translateX(4px); }
+.tp-waiting { color: var(--muted); font-size: 1rem; padding: 2rem; border: 1px dashed var(--border); border-radius: var(--radius); }
+
+/* Bid screen header */
+.tp-header { display: flex; align-items: center; justify-content: space-between; padding: .8rem 1.2rem; background: var(--bg2); border-bottom: 1px solid var(--border); }
+.tp-header-left { display: flex; align-items: center; gap: .8rem; }
+.tp-team-name { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; color: var(--accent); }
+.tp-role-badge { background: var(--accent2); color: #fff; font-size: .65rem; padding: .2rem .6rem; border-radius: 20px; letter-spacing: 1px; font-weight: 700; }
+.tp-header-center { font-size: .85rem; color: var(--muted); }
+.tp-header-right { text-align: right; }
+.tp-budget-label { display: block; font-size: .7rem; color: var(--muted); }
+.tp-budget-val { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; color: var(--green); }
+
+/* Event */
+.tp-event { background: linear-gradient(135deg, rgba(239,68,68,.2), rgba(239,68,68,.05)); border: 1px solid var(--red); border-radius: 8px; padding: .8rem 1.2rem; margin: .5rem 1rem 0; font-size: .9rem; color: var(--red); animation: pulse-red 1s ease 3; }
+.tp-event.hidden { display: none; }
+
+/* Main layout */
+.tp-main { display: flex; flex: 1; gap: 1rem; padding: 1rem; overflow-y: auto; }
+
+/* Item card */
+.tp-item-card { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; text-align: center; position: relative; overflow: hidden; }
+.tp-item-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+.tp-item-card.special-item { border-color: #fbbf24; box-shadow: 0 0 20px rgba(251,191,36,.3); }
+.tp-item-badge { display: inline-block; padding: .3rem .9rem; border-radius: 20px; font-size: .75rem; font-weight: 700; margin-bottom: .8rem; color: #fff; }
+.tp-item-emoji { font-size: 4rem; margin: .5rem 0; }
+.tp-item-name { font-family: 'Orbitron', sans-serif; font-size: 1.3rem; margin-bottom: .4rem; }
+.tp-item-desc { color: var(--muted); font-size: .88rem; margin-bottom: 1rem; }
+.tp-price-row { margin-bottom: 1rem; }
+.tp-base { color: var(--muted); font-size: .9rem; }
+.tp-live-bid { background: var(--card2); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; }
+.tp-live-label { font-size: .7rem; color: var(--muted); letter-spacing: 2px; }
+.tp-live-amount { font-family: 'Orbitron', sans-serif; font-size: 2rem; color: var(--accent); margin: .3rem 0; }
+.tp-live-bidder { font-size: .9rem; color: var(--yellow); font-weight: 600; }
+
+/* Bid panel */
+.tp-bid-panel { flex: 0 0 260px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.2rem; display: flex; flex-direction: column; gap: .9rem; }
+.tp-bid-title { font-family: 'Orbitron', sans-serif; font-size: .9rem; color: var(--accent); text-align: center; }
+.tp-bid-row { display: flex; align-items: center; gap: .5rem; }
+.tp-step { background: var(--card2); border: 1px solid var(--border); color: var(--text); width: 42px; height: 42px; border-radius: 8px; cursor: pointer; font-size: 1.3rem; flex-shrink: 0; }
+.tp-bid-input-wrap { flex: 1; position: relative; }
+.tp-bid-input-wrap input { width: 100%; background: var(--card2); border: 1px solid var(--border); border-radius: 8px; padding: .6rem; color: var(--accent); font-family: 'Orbitron', sans-serif; font-size: 1.2rem; text-align: center; }
+.tp-bid-input-wrap input:focus { outline: none; border-color: var(--accent); }
+.tp-unit { display: block; text-align: center; font-size: .7rem; color: var(--muted); margin-top: .2rem; }
+.tp-quick-btns { display: grid; grid-template-columns: 1fr 1fr; gap: .4rem; }
+.tp-quick-btns button { background: var(--card2); border: 1px solid var(--border); color: var(--muted); padding: .4rem; border-radius: 6px; cursor: pointer; font-family: 'Rajdhani', sans-serif; font-size: .85rem; font-weight: 600; transition: all .2s; }
+.tp-quick-btns button:hover { border-color: var(--accent); color: var(--accent); }
+.tp-btn-bid { background: linear-gradient(135deg, #7c3aed, #4f46e5); color: #fff; border: none; padding: .9rem; border-radius: 8px; font-size: 1.1rem; font-weight: 700; cursor: pointer; font-family: 'Rajdhani', sans-serif; transition: all .2s; }
+.tp-btn-bid:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(124,58,237,.5); }
+.tp-btn-bid:disabled { opacity: .4; cursor: not-allowed; }
+.tp-bid-hint { font-size: .8rem; color: var(--muted); text-align: center; }
+.tp-sold-msg { background: rgba(16,185,129,.15); border: 1px solid var(--green); border-radius: 8px; padding: .7rem; text-align: center; color: var(--green); font-weight: 600; }
+.tp-wait-msg { color: var(--muted); text-align: center; font-size: .9rem; }
+
+/* Inventory */
+.tp-inventory { border-top: 1px solid var(--border); background: var(--bg2); }
+.tp-inv-header { display: flex; align-items: center; gap: .5rem; padding: .8rem 1.2rem; cursor: pointer; font-weight: 600; color: var(--text); user-select: none; }
+.tp-inv-header:hover { color: var(--accent); }
+.tp-inv-toggle { margin-left: auto; font-size: .8rem; color: var(--muted); }
+.tp-inv-list { padding: .5rem 1rem 1rem; display: flex; flex-wrap: wrap; gap: .5rem; max-height: 150px; overflow-y: auto; }
+.tp-inv-item { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: .4rem .8rem; font-size: .85rem; display: flex; align-items: center; gap: .4rem; }
+
+@media (max-width: 600px) {
+  .tp-main { flex-direction: column; }
+  .tp-bid-panel { flex: none; }
+  .tp-item-emoji { font-size: 2.5rem; }
+  .tp-item-name { font-size: 1rem; }
+  .tp-live-amount { font-size: 1.5rem; }
+}

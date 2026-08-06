@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin – Smart City Auction</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- LANDING -->
+  <div id="page-landing" class="page active">
+    <div class="stars"></div>
+    <div class="landing-content">
+      <div class="logo-glow">🏙️</div>
+      <h1 class="title-main">SMART CITY<br/><span>OF THE FUTURE</span></h1>
+      <p class="subtitle">Tech Auction · City Building · Strategy Challenge</p>
+      <div class="landing-buttons">
+        <button class="btn-primary" onclick="goTo('page-setup')">🎮 Host Game</button>
+        <button class="btn-secondary" onclick="goTo('page-rules')">📋 View Rules</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RULES -->
+  <div id="page-rules" class="page">
+    <div class="page-header">
+      <button class="btn-back" onclick="goTo('page-landing')">← Back</button>
+      <h2>📋 Game Rules</h2>
+    </div>
+    <div class="rules-content">
+      <div class="rule-card">
+        <h3>🎯 Objective</h3>
+        <p>Purchase the best combination of technology components and build the most efficient, secure, and sustainable smart city.</p>
+      </div>
+      <div class="rule-card">
+        <h3>⏱️ Duration: 2.5 Hours</h3>
+        <ul>
+          <li>📖 Introduction & Rules – 15 min</li>
+          <li>🔨 Auction – 60–75 min</li>
+          <li>🗺️ City Planning – 45 min</li>
+          <li>🎤 Presentation – 20–25 min</li>
+          <li>🏆 Results – 10 min</li>
+        </ul>
+      </div>
+      <div class="rule-card">
+        <h3>👥 Team Details</h3>
+        <ul>
+          <li>Team Size: 4–6 students</li>
+          <li>Number of Teams: 8–15</li>
+          <li>Starting Budget: ₹10 Crore (Virtual)</li>
+        </ul>
+      </div>
+      <div class="rule-card">
+        <h3>📊 Scoring</h3>
+        <table class="score-table">
+          <tr><td>Smart Auction Strategy</td><td>20</td></tr>
+          <tr><td>Budget Management</td><td>15</td></tr>
+          <tr><td>Correct Technology Usage</td><td>20</td></tr>
+          <tr><td>Smart City Design</td><td>20</td></tr>
+          <tr><td>Innovation</td><td>10</td></tr>
+          <tr><td>Presentation</td><td>10</td></tr>
+          <tr><td>Teamwork</td><td>5</td></tr>
+          <tr class="total"><td><strong>Total</strong></td><td><strong>100</strong></td></tr>
+        </table>
+      </div>
+      <div class="rule-card">
+        <h3>⚡ Surprise Events</h3>
+        <ul>
+          <li>🔴 <strong>Cyber Attack</strong> – No Firewall → −10 pts</li>
+          <li>⚡ <strong>Power Failure</strong> – No UPS → −5 pts</li>
+          <li>🌊 <strong>Flood</strong> – Env Sensor → +5 pts</li>
+          <li>🚗 <strong>Heavy Traffic</strong> – Traffic Signal → +5 pts</li>
+          <li>📡 <strong>Internet Failure</strong> – No Fiber/LB → −8 pts</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETUP -->
+  <div id="page-setup" class="page">
+    <div class="page-header">
+      <button class="btn-back" onclick="goTo('page-landing')">← Back</button>
+      <h2>⚙️ Game Setup</h2>
+    </div>
+    <div class="setup-content">
+      <div class="setup-card">
+        <h3>Add Teams</h3>
+        <div class="team-input-row">
+          <input type="text" id="teamNameInput" placeholder="Enter team name…" maxlength="30"/>
+          <button class="btn-add" onclick="addTeam()">+ Add</button>
+        </div>
+        <div id="teamList" class="team-list"></div>
+      </div>
+      <div class="setup-card">
+        <h3>Starting Budget per Team</h3>
+        <div class="budget-selector">
+          <button class="budget-btn active" onclick="setBudget(this, 1000)">₹10 Cr</button>
+          <button class="budget-btn" onclick="setBudget(this, 1500)">₹15 Cr</button>
+          <button class="budget-btn" onclick="setBudget(this, 2000)">₹20 Cr</button>
+        </div>
+        <p class="budget-note">Current: <span id="budgetDisplay">₹10 Crore</span> per team</p>
+      </div>
+      <button class="btn-primary btn-large" onclick="startGame()">🚀 Start Auction</button>
+    </div>
+  </div>
+
+  <!-- AUCTION (ADMIN) -->
+  <div id="page-auction" class="page">
+    <div class="auction-header">
+      <div class="auction-title">🔨 ADMIN – TECH AUCTION</div>
+      <div class="auction-meta">
+        <span id="itemCounter">Item 1 / 38</span>
+        <button class="btn-open-panels" onclick="openAllTeamPanels()">📱 Open All Team Panels</button>
+      </div>
+    </div>
+
+    <div class="ticker-wrap">
+      <div class="ticker">
+        💰 Bid wisely! Every tech asset shapes your city &nbsp;|&nbsp;
+        🏙️ Build the smartest city and win &nbsp;|&nbsp;
+        ⚡ Surprise events ahead – plan for resilience &nbsp;|&nbsp;
+        🔒 Security matters – don't skip the Firewall! &nbsp;
+      </div>
+    </div>
+
+    <div class="auction-body">
+
+      <!-- LEFT: Current Item -->
+      <div class="current-item-panel">
+        <div id="eventBanner" class="event-banner hidden"></div>
+        <div id="soldBanner" class="sold-banner hidden"></div>
+
+        <div class="item-card" id="currentItemCard">
+          <div class="item-badge" id="itemCategory">Networking</div>
+          <div class="item-emoji" id="itemEmoji">🔌</div>
+          <h2 id="itemName">Enterprise Router</h2>
+          <p id="itemDesc" class="item-desc">–</p>
+          <div class="item-price-row">
+            <span class="base-price">Base: <strong id="basePrice">₹40 L</strong></span>
+          </div>
+          <div class="bid-display">
+            <div class="current-bid-label">LIVE BID</div>
+            <div class="current-bid-amount" id="currentBid">₹40 L</div>
+            <div class="current-bidder" id="currentBidder">No bids yet</div>
+          </div>
+        </div>
+
+        <!-- Admin override bid -->
+        <div class="bid-controls">
+          <div class="admin-bid-label">🎛️ Admin Override Bid</div>
+          <select id="bidTeamSelect" class="team-select"></select>
+          <div class="bid-amount-row">
+            <button class="bid-step" onclick="adjustBid(-10)">−</button>
+            <input type="number" id="bidAmount" value="40" min="0" step="10"/>
+            <span class="bid-unit">Lakhs</span>
+            <button class="bid-step" onclick="adjustBid(10)">+</button>
+          </div>
+          <div class="bid-btn-row">
+            <button class="btn-bid"  onclick="placeBid()">🔨 Bid</button>
+            <button class="btn-sold" onclick="sellItem()">✅ SOLD!</button>
+            <button class="btn-skip" onclick="skipItem()">⏭ Skip</button>
+          </div>
+        </div>
+
+        <div class="auction-nav" style="margin-top:.5rem;">
+          <button class="btn-secondary" onclick="prevItem()">◀ Prev</button>
+          <button class="btn-primary"   onclick="nextItem()">Next ▶</button>
+        </div>
+      </div>
+
+      <!-- MIDDLE: Teams grid -->
+      <div class="teams-panel">
+        <div class="teams-panel-top">
+          <h3>💼 Teams</h3>
+          <div id="team-launch-btns" class="team-launch-row"></div>
+        </div>
+        <div id="teamsGrid" class="teams-grid"></div>
+        <button class="btn-finish-auction" onclick="goTo('page-city')">🗺️ City Planning →</button>
+      </div>
+
+      <!-- RIGHT: Bid Log -->
+      <div class="bidlog-panel">
+        <h3>📋 Live Bid Log</h3>
+        <div id="bidLog" class="bid-log"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CITY PLANNING -->
+  <div id="page-city" class="page">
+    <div class="page-header">
+      <button class="btn-back" onclick="goTo('page-auction')">← Back</button>
+      <h2>🗺️ City Planning</h2>
+      <select id="cityTeamSelect" class="team-select-sm" onchange="loadTeamCity()"></select>
+    </div>
+    <div class="city-layout">
+      <div class="city-map-panel">
+        <div class="city-map" id="cityMap"></div>
+      </div>
+      <div class="city-sidebar">
+        <div class="inventory-panel">
+          <h3>🎒 Inventory</h3>
+          <p class="inv-budget" id="invBudget">Remaining: ₹0</p>
+          <div id="inventoryList" class="inventory-list"></div>
+        </div>
+        <div class="checklist-panel">
+          <h3>✅ Requirements</h3>
+          <div id="cityChecklist" class="checklist"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCORING -->
+  <div id="page-scoring" class="page">
+    <div class="page-header">
+      <button class="btn-back" onclick="goTo('page-city')">← Back</button>
+      <h2>🏆 Scoring & Results</h2>
+    </div>
+    <div class="scoring-content">
+      <div id="scoreCards" class="score-cards"></div>
+      <button class="btn-primary btn-large" onclick="computeFinal()">📊 Compute Final Scores</button>
+      <div id="leaderboard" class="leaderboard hidden"></div>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="shared.js"></script>
+  <script src="app.js"></script>
+
+  <script>
+    // Render team launch buttons after DOM ready
+    document.addEventListener('DOMContentLoaded', () => {
+      // Override the renderTeamsGrid to also update launch buttons
+      const origRender = window.renderTeamsGrid;
+      window.renderTeamsGrid = function() {
+        origRender();
+        const s = getState();
+        if (!s) return;
+        document.getElementById('team-launch-btns').innerHTML = s.teams.map(t =>
+          `<button class="btn-team-launch" onclick="openTeamPanel('${t.name.replace(/'/g,"\\'")}')">
+            📱 ${t.name}
+          </button>`
+        ).join('');
+      };
+    });
+  </script>
+</body>
+</html>

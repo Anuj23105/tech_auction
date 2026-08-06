@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Join – Smart City Auction</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <!-- QR code library (loads from CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    body { background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; font-family: 'Rajdhani', sans-serif; color: var(--text); }
+    h1 { font-family: 'Orbitron', sans-serif; color: var(--accent); font-size: 1.8rem; margin-bottom: .3rem; text-align: center; }
+    .subtitle { color: var(--muted); margin-bottom: 2rem; text-align: center; font-size: 1rem; }
+    .cards { display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: center; width: 100%; }
+    .qr-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; text-align: center; min-width: 200px; }
+    .qr-card h3 { color: var(--accent); font-size: 1.1rem; margin-bottom: 1rem; }
+    .qr-box { background: white; padding: 10px; border-radius: 8px; display: inline-block; margin-bottom: 1rem; }
+    .qr-url { font-size: .75rem; color: var(--muted); word-break: break-all; }
+    .team-badge { display: inline-block; background: var(--accent2); color: #fff; border-radius: 20px; padding: .3rem .9rem; font-size: .85rem; font-weight: 700; margin-bottom: .8rem; }
+    .note { margin-top: 2rem; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 2rem; max-width: 500px; text-align: center; color: var(--muted); font-size: .9rem; }
+    .note strong { color: var(--text); }
+    .server-url { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; color: var(--accent); background: var(--card2); padding: .6rem 1.5rem; border-radius: 8px; display: inline-block; margin: .5rem 0; letter-spacing: 1px; }
+    .refresh-btn { background: none; border: 1px solid var(--border); color: var(--muted); padding: .5rem 1.2rem; border-radius: 8px; cursor: pointer; font-family: 'Rajdhani', sans-serif; margin-top: 1.5rem; }
+    .refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .no-teams { color: var(--muted); font-size: 1rem; padding: 2rem; border: 1px dashed var(--border); border-radius: var(--radius); }
+  </style>
+</head>
+<body>
+  <h1>📱 Team Join Page</h1>
+  <p class="subtitle">Each team scans their QR code to open their bidding panel</p>
+
+  <div class="server-url" id="serverUrl">Detecting URL…</div>
+
+  <div class="cards" id="qrCards">
+    <p class="no-teams">⏳ Waiting for host to start the game…</p>
+  </div>
+
+  <div class="note">
+    <strong>How to use:</strong><br/>
+    Make sure all devices are on the same WiFi network.<br/>
+    Each team scans their QR code or types the URL into any browser.
+  </div>
+
+  <button class="refresh-btn" onclick="location.reload()">🔄 Refresh</button>
+
+  <script src="shared.js"></script>
+  <script>
+    // Detect current server URL
+    const base = location.origin + location.pathname.replace('join.html', '');
+    document.getElementById('serverUrl').textContent = base;
+
+    function renderQRCodes() {
+      const s = getState();
+      const container = document.getElementById('qrCards');
+      if (!s || !s.started || !s.teams || !s.teams.length) {
+        container.innerHTML = '<p class="no-teams">⏳ Waiting for host to start the game…</p>';
+        return;
+      }
+
+      container.innerHTML = '';
+      s.teams.forEach(t => {
+        const url = base + 'team.html?team=' + encodeURIComponent(t.name);
+
+        const card = document.createElement('div');
+        card.className = 'qr-card';
+        card.innerHTML = `
+          <div class="team-badge">${t.name}</div>
+          <h3>Budget: ${formatL(t.budget)}</h3>
+          <div class="qr-box" id="qr-${sanitize(t.name)}"></div>
+          <div class="qr-url">${url}</div>
+        `;
+        container.appendChild(card);
+
+        // Generate QR
+        setTimeout(() => {
+          new QRCode(document.getElementById('qr-' + sanitize(t.name)), {
+            text: url,
+            width: 160,
+            height: 160,
+            colorDark: '#000000',
+            colorLight: '#ffffff',
+          });
+        }, 50);
+      });
+    }
+
+    renderQRCodes();
+
+    // Listen for game start
+    if (typeof BroadcastChannel !== 'undefined') {
+      const ch = new BroadcastChannel('smartcity');
+      ch.onmessage = () => renderQRCodes();
+    }
+    setInterval(renderQRCodes, 3000);
+  </script>
+</body>
+</html>
