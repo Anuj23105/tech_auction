@@ -1,0 +1,12 @@
+{
+  "name": "tech-auction",
+  "version": "1.0.0",
+  "description": "Smart City Tech Auction Game",
+  "scripts": {
+    "dev": "npx serve . -l 3000",
+    "start": "npx serve . -l 3000"
+  },
+  "keywords": ["game", "auction", "smart-city"],
+  "author": "",
+  "license": "ISC"
+}

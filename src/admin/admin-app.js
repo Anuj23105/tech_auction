@@ -2,8 +2,12 @@
 //  ADMIN APP  –  uses shared state from shared.js
 // ============================================================
 
+import { getState, setState } from '../shared/state.js';
+import { formatL, sanitize, showToast, categoryColor, shuffle } from '../shared/utils.js';
+import { AUCTION_ITEMS, SURPRISE_EVENTS, CITY_ZONES, CITY_REQUIREMENTS } from '../data/auction-data.js';
+
 // ---- NAV ----
-function goTo(pageId) {
+export function goTo(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(pageId).classList.add('active');
   if (pageId === 'page-city')    initCityPage();
@@ -16,7 +20,7 @@ let setupState = {
   budgetPerTeam: 1000,
 };
 
-function addTeam() {
+export function addTeam() {
   const input = document.getElementById('teamNameInput');
   const name = input.value.trim();
   if (!name) return alert('Enter a team name.');
@@ -26,10 +30,12 @@ function addTeam() {
   input.value = '';
   renderTeamList();
 }
-function removeTeam(name) {
+
+export function removeTeam(name) {
   setupState.teams = setupState.teams.filter(t => t.name !== name);
   renderTeamList();
 }
+
 function renderTeamList() {
   document.getElementById('teamList').innerHTML = setupState.teams.map((t, i) => `
     <div class="team-chip">
@@ -37,14 +43,15 @@ function renderTeamList() {
       <button onclick="removeTeam('${t.name}')" class="btn-remove">✕</button>
     </div>`).join('');
 }
-function setBudget(btn, val) {
+
+export function setBudget(btn, val) {
   setupState.budgetPerTeam = val;
   document.querySelectorAll('.budget-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('budgetDisplay').textContent = '₹' + (val / 100) + ' Crore';
 }
 
-function startGame() {
+export function startGame() {
   if (setupState.teams.length < 2) return alert('Add at least 2 teams.');
   const regular = AUCTION_ITEMS.filter(i => !i.special);
   const special  = AUCTION_ITEMS.filter(i =>  i.special);
@@ -78,7 +85,7 @@ function startGame() {
 }
 
 // ---- AUCTION ----
-function renderAuction() {
+export function renderAuction() {
   const s = getState();
   if (!s) return;
   const item = s.auctionItems[s.currentItemIdx];
@@ -150,7 +157,7 @@ function checkEventTrigger() {
   showToast(event.name + ' – ' + event.effect, 5000);
 }
 
-function renderTeamsGrid() {
+export function renderTeamsGrid() {
   const s = getState();
   if (!s) return;
   document.getElementById('teamsGrid').innerHTML = s.teams.map(t => `
@@ -163,7 +170,7 @@ function renderTeamsGrid() {
     </div>`).join('');
 }
 
-function renderBidLog() {
+export function renderBidLog() {
   const s = getState();
   if (!s) return;
   const log = document.getElementById('bidLog');
@@ -175,14 +182,14 @@ function renderBidLog() {
 }
 
 // ---- ADMIN BID (fallback for host to bid on behalf) ----
-function adjustBid(delta) {
+export function adjustBid(delta) {
   const inp = document.getElementById('bidAmount');
   const s = getState();
   const min = s ? (s.currentBidTeam ? s.currentBidAmount + 10 : (s.auctionItems[s.currentItemIdx]?.base || 0)) : 0;
   inp.value = Math.max(min, (parseInt(inp.value) || 0) + delta);
 }
 
-function placeBid() {
+export function placeBid() {
   const s = getState();
   if (!s) return;
   const teamName = document.getElementById('bidTeamSelect').value;
@@ -202,7 +209,7 @@ function placeBid() {
   showToast(`🔨 ${teamName} bids ${formatL(amount)}`, 1500);
 }
 
-function sellItem() {
+export function sellItem() {
   const s = getState();
   if (!s) return;
   if (!s.currentBidTeam) return showToast('No bids placed!', 2000);
@@ -223,13 +230,13 @@ function sellItem() {
   setTimeout(nextItem, 1500);
 }
 
-function skipItem() {
+export function skipItem() {
   const s = getState();
   showToast(`⏭ ${s.auctionItems[s.currentItemIdx].name} skipped.`, 1500);
   nextItem();
 }
 
-function nextItem() {
+export function nextItem() {
   const s = getState();
   if (!s) return;
   if (s.currentItemIdx < s.auctionItems.length - 1) {
@@ -245,7 +252,7 @@ function nextItem() {
   }
 }
 
-function prevItem() {
+export function prevItem() {
   const s = getState();
   if (!s || s.currentItemIdx <= 0) return;
   s.currentItemIdx--;
@@ -257,19 +264,20 @@ function prevItem() {
 }
 
 // ---- TEAM PANELS ----
-function openAllTeamPanels() {
+export function openAllTeamPanels() {
   const s = getState();
   if (!s) return;
   s.teams.forEach(t => {
     window.open(`team.html?team=${encodeURIComponent(t.name)}`, `team_${sanitize(t.name)}`);
   });
 }
-function openTeamPanel(name) {
+
+export function openTeamPanel(name) {
   window.open(`team.html?team=${encodeURIComponent(name)}`, `team_${sanitize(name)}`);
 }
 
 // ---- POPULATE TEAM SELECT ----
-function populateBidTeamSelect() {
+export function populateBidTeamSelect() {
   const s = getState();
   if (!s) return;
   const sel = document.getElementById('bidTeamSelect');
@@ -280,7 +288,7 @@ function populateBidTeamSelect() {
 }
 
 // ---- CITY PAGE ----
-function initCityPage() {
+export function initCityPage() {
   const s = getState();
   if (!s) return;
   const sel = document.getElementById('cityTeamSelect');
@@ -288,7 +296,8 @@ function initCityPage() {
   renderCityMap();
   loadTeamCity();
 }
-function renderCityMap() {
+
+export function renderCityMap() {
   const map = document.getElementById('cityMap');
   map.innerHTML = CITY_ZONES.map(z => `
     <div class="zone" id="zone-${z.id}"
@@ -300,7 +309,8 @@ function renderCityMap() {
       <div class="zone-items" id="zone-items-${z.id}"></div>
     </div>`).join('');
 }
-function loadTeamCity() {
+
+export function loadTeamCity() {
   const s = getState();
   if (!s) return;
   const teamName = document.getElementById('cityTeamSelect').value;
@@ -315,11 +325,13 @@ function loadTeamCity() {
     : '<p class="empty-msg">No items purchased.</p>';
   updateChecklist(teamName);
 }
-function dragItem(event, itemId, teamName) {
+
+export function dragItem(event, itemId, teamName) {
   event.dataTransfer.setData('itemId', itemId);
   event.dataTransfer.setData('teamName', teamName);
 }
-function dropOnZone(event, zoneId) {
+
+export function dropOnZone(event, zoneId) {
   event.preventDefault();
   const itemId = event.dataTransfer.getData('itemId');
   const item   = AUCTION_ITEMS.find(i => i.id === itemId);
@@ -330,7 +342,8 @@ function dropOnZone(event, zoneId) {
   chip.textContent = item.emoji + ' ' + item.name.split(' ')[0];
   zoneEl.appendChild(chip);
 }
-function updateChecklist(teamName) {
+
+export function updateChecklist(teamName) {
   const s = getState();
   if (!s) return;
   const team = s.teams.find(t => t.name === teamName);
@@ -342,7 +355,7 @@ function updateChecklist(teamName) {
 }
 
 // ---- SCORING ----
-function initScoringPage() {
+export function initScoringPage() {
   const s = getState();
   if (!s) return;
   document.getElementById('scoreCards').innerHTML = s.teams.map(t => `
@@ -365,7 +378,7 @@ function initScoringPage() {
     </div>`).join('');
 }
 
-function computeFinal() {
+export function computeFinal() {
   const s = getState();
   if (!s) return;
   const results = s.teams.map(t => {
@@ -394,42 +407,3 @@ function computeFinal() {
   lb.scrollIntoView({ behavior: 'smooth' });
   if (results[0]) showToast(`🏆 Winner: ${results[0].name} with ${results[0].total} pts!`, 5000);
 }
-
-// ---- LISTEN for team bids ----
-if (channel) {
-  channel.onmessage = (e) => {
-    if (e.data.type === 'STATE_UPDATE') {
-      const page = document.querySelector('.page.active');
-      if (page && page.id === 'page-auction') {
-        renderAuction();
-        populateBidTeamSelect();
-      }
-    }
-  };
-}
-// Poll fallback
-setInterval(() => {
-  const page = document.querySelector('.page.active');
-  if (page && page.id === 'page-auction') {
-    renderAuction();
-    populateBidTeamSelect();
-  }
-}, 1500);
-
-// ---- DOMContentLoaded ----
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('teamNameInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') addTeam();
-  });
-  // Check if a game was already in progress
-  const s = getState();
-  if (s && s.started) {
-    // Offer to resume
-    if (confirm('A game is already in progress. Resume it?')) {
-      renderAuction();
-      goTo('page-auction');
-    } else {
-      localStorage.removeItem('smartcity_state');
-    }
-  }
-});

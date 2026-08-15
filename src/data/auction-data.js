@@ -1,7 +1,7 @@
 // ============================================================
 //  AUCTION ITEMS
 // ============================================================
-const AUCTION_ITEMS = [
+export const AUCTION_ITEMS = [
   // --- Networking ---
   { id: 'router',      name: 'Enterprise Router',        category: 'Networking',  emoji: '🔌', base: 40,  desc: 'Core routing for entire city network',           special: false },
   { id: 'switch',      name: 'Core Switch',              category: 'Networking',  emoji: '🔀', base: 35,  desc: 'High-speed switching fabric for data centers',    special: false },
@@ -57,7 +57,7 @@ const AUCTION_ITEMS = [
 // ============================================================
 //  SURPRISE EVENTS  (trigger every 8–10 items)
 // ============================================================
-const SURPRISE_EVENTS = [
+export const SURPRISE_EVENTS = [
   {
     id: 'cyberattack',
     name: '⚠️ CYBER ATTACK!',
@@ -108,7 +108,7 @@ const SURPRISE_EVENTS = [
 // ============================================================
 //  CITY ZONES (for the map)
 // ============================================================
-const CITY_ZONES = [
+export const CITY_ZONES = [
   { id: 'residential', name: 'Residential Area',    emoji: '🏘️', x: 10,  y: 10, w: 20, h: 18 },
   { id: 'hospital',    name: 'Hospital',            emoji: '🏥', x: 35,  y: 10, w: 15, h: 15 },
   { id: 'school',      name: 'School',              emoji: '🏫', x: 55,  y: 10, w: 15, h: 15 },
@@ -126,7 +126,7 @@ const CITY_ZONES = [
 // ============================================================
 //  CITY REQUIREMENTS (checklist)
 // ============================================================
-const CITY_REQUIREMENTS = [
+export const CITY_REQUIREMENTS = [
   { id: 'req_net',      label: 'Internet Connectivity',    needs: ['router', 'fiber', 'wifi'] },
   { id: 'req_sec',      label: 'Security Systems',         needs: ['firewall', 'cctv', 'biometric'] },
   { id: 'req_safety',   label: 'Public Safety',            needs: ['cctv', 'police', 'emergency'] },

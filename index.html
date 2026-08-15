@@ -227,26 +227,6 @@
     </div>
   </div>
 
-  <script src="data.js"></script>
-  <script src="shared.js"></script>
-  <script src="app.js"></script>
-
-  <script>
-    // Render team launch buttons after DOM ready
-    document.addEventListener('DOMContentLoaded', () => {
-      // Override the renderTeamsGrid to also update launch buttons
-      const origRender = window.renderTeamsGrid;
-      window.renderTeamsGrid = function() {
-        origRender();
-        const s = getState();
-        if (!s) return;
-        document.getElementById('team-launch-btns').innerHTML = s.teams.map(t =>
-          `<button class="btn-team-launch" onclick="openTeamPanel('${t.name.replace(/'/g,"\\'")}')">
-            📱 ${t.name}
-          </button>`
-        ).join('');
-      };
-    });
-  </script>
+  <script type="module" src="src/index.js"></script>
 </body>
 </html>

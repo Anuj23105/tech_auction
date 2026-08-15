@@ -1,12 +1,16 @@
 // ============================================================
 //  TEAM PANEL LOGIC
 // ============================================================
+
+import { getState } from '../shared/state.js';
+import { formatL, showToast, categoryColor } from '../shared/utils.js';
+
 let myTeamName = null;
 let lastItemIdx = -1;
 let bidLocked = false;
 
 // ---- boot ----
-function tpBoot() {
+export function tpBoot() {
   const s = getState();
   if (!s || !s.started) {
     // Show select screen; poll for game start
@@ -23,7 +27,7 @@ function tpBoot() {
   renderSelectScreen(s);
 }
 
-function renderSelectScreen(s) {
+export function renderSelectScreen(s) {
   const btns = document.getElementById('tp-team-buttons');
   if (!s || !s.started) {
     btns.innerHTML = '<p class="tp-waiting">⏳ Waiting for host to start the game…</p>';
@@ -34,7 +38,7 @@ function renderSelectScreen(s) {
   ).join('');
 }
 
-function joinTeam(name) {
+export function joinTeam(name) {
   myTeamName = name;
   document.getElementById('tp-select').classList.remove('active');
   document.getElementById('tp-bid').classList.add('active');
@@ -42,7 +46,7 @@ function joinTeam(name) {
 }
 
 // ---- main render ----
-function renderBidScreen() {
+export function renderBidScreen() {
   const s = getState();
   if (!s) return;
 
@@ -111,17 +115,18 @@ function renderBidScreen() {
 }
 
 // ---- bid ----
-function tpAdjust(delta) {
+export function tpAdjust(delta) {
   const inp = document.getElementById('tp-bidInput');
   inp.value = Math.max(parseInt(inp.min) || 0, (parseInt(inp.value) || 0) + delta);
 }
-function tpSetBid(val) {
+
+export function tpSetBid(val) {
   const s = getState();
   const minBid = s ? (s.currentBidTeam ? s.currentBidAmount + 10 : (s.auctionItems[s.currentItemIdx]?.base || 0)) : val;
   document.getElementById('tp-bidInput').value = Math.max(minBid, val);
 }
 
-function tpPlaceBid() {
+export function tpPlaceBid() {
   if (bidLocked) return;
   const s = getState();
   if (!s || !s.started) return showToast('Game not started yet.', 2000);
@@ -149,7 +154,7 @@ function tpPlaceBid() {
 }
 
 // ---- inventory toggle ----
-function toggleInv() {
+export function toggleInv() {
   const list = document.getElementById('tp-invList');
   const icon = document.getElementById('tp-invToggle');
   list.classList.toggle('hidden');
@@ -157,6 +162,8 @@ function toggleInv() {
 }
 
 // ---- listen for state changes ----
+import { channel, setState } from '../shared/state.js';
+
 if (channel) {
   channel.onmessage = (e) => {
     if (e.data.type === 'STATE_UPDATE') {
@@ -175,6 +182,3 @@ setInterval(() => {
 }, 1500);
 
 function esc(s) { return s.replace(/'/g, "\\'"); }
-
-// Boot
-tpBoot();
