@@ -14,6 +14,54 @@ export function goTo(pageId) {
   if (pageId === 'page-scoring') initScoringPage();
 }
 
+// ---- CONNECTION INFO (share-able link, works when WiFi changes per venue) ----
+export function openNetworkInfo() {
+  document.getElementById('networkInfoModal').classList.remove('hidden');
+  loadNetworkInfo();
+}
+
+export function closeNetworkInfo() {
+  document.getElementById('networkInfoModal').classList.add('hidden');
+}
+
+export async function loadNetworkInfo() {
+  const list = document.getElementById('networkInfoList');
+  list.innerHTML = '<p class="no-teams">Detecting network…</p>';
+  try {
+    const res = await fetch('/api/network-info', { cache: 'no-store' });
+    if (!res.ok) throw new Error('bad response');
+    const { port, ips } = await res.json();
+
+    if (!ips || !ips.length) {
+      list.innerHTML = '<p class="no-teams">No network adapter detected. Make sure you\'re connected to WiFi.</p>';
+      return;
+    }
+
+    const firstGoodIdx = ips.findIndex(ip => !ip.likelyVirtual);
+    list.innerHTML = ips.map(({ name, address, likelyVirtual }, idx) => {
+      const url = `http://${address}:${port}/join.html`;
+      const isRecommended = idx === firstGoodIdx;
+      return `
+        <div class="network-info-card ${isRecommended ? 'recommended' : ''}">
+          <div class="network-info-name">${isRecommended ? '✅ Recommended — ' : ''}${sanitize(name)}${likelyVirtual ? ' (virtual adapter, participants likely can\'t reach this)' : ''}</div>
+          <div class="network-info-url" id="net-url-${idx}">${url}</div>
+          <button class="btn-copy" onclick="copyNetworkUrl(${idx})">📋 Copy Link</button>
+        </div>`;
+    }).join('');
+  } catch {
+    list.innerHTML = '<p class="no-teams">⚠️ Could not reach the server. Is it running?</p>';
+  }
+}
+
+export function copyNetworkUrl(idx) {
+  const el = document.getElementById('net-url-' + idx);
+  if (!el) return;
+  navigator.clipboard.writeText(el.textContent).then(
+    () => showToast('✅ Link copied!', 1500),
+    () => showToast('Could not copy — select and copy manually.', 2000)
+  );
+}
+
 // ---- SETUP ----
 let setupState = {
   teams: [],

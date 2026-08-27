@@ -2,7 +2,7 @@
 //  TEAM PANEL LOGIC
 // ============================================================
 
-import { getState } from '../shared/state.js';
+import { getState, setState, channel, onStateChange } from '../shared/state.js';
 import { formatL, showToast, categoryColor } from '../shared/utils.js';
 
 let myTeamName = null;
@@ -162,23 +162,20 @@ export function toggleInv() {
 }
 
 // ---- listen for state changes ----
-import { channel, setState } from '../shared/state.js';
 
-if (channel) {
-  channel.onmessage = (e) => {
-    if (e.data.type === 'STATE_UPDATE') {
-      const s = getState();
-      if (!myTeamName) { renderSelectScreen(s); return; }
-      renderBidScreen();
-    }
-  };
+function handleStateChange(s) {
+  if (!myTeamName) { renderSelectScreen(s); return; }
+  renderBidScreen();
 }
 
-// Also poll every 1.5s as fallback (for cross-browser)
-setInterval(() => {
-  const s = getState();
-  if (!myTeamName) { renderSelectScreen(s); }
-  else renderBidScreen();
-}, 1500);
+if (channel) {
+  channel.addEventListener('message', (e) => {
+    if (e.data.type === 'STATE_UPDATE') handleStateChange(getState());
+  });
+}
+
+// Fires on every server poll too, so this works across separate devices,
+// not just tabs in the same browser.
+onStateChange(handleStateChange);
 
 function esc(s) { return s.replace(/'/g, "\\'"); }

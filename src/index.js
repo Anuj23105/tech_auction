@@ -3,7 +3,7 @@
 // ============================================================
 
 import { initGlobals } from './lib/exports.js';
-import { getState } from './shared/state.js';
+import { getState, clearState } from './shared/state.js';
 import { goTo, renderAuction } from './admin/admin-app.js';
 
 // Initialize globals for onclick handlers
@@ -23,7 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
       renderAuction();
       goTo('page-auction');
     } else {
-      localStorage.removeItem('smartcity_state');
+      // Must clear the SERVER copy too, otherwise the discarded game
+      // reappears on the next poll (and on every team's device).
+      clearState();
     }
   }
 
@@ -42,25 +44,23 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ---- Listen for team bids ----
-import { channel } from './shared/state.js';
+import { channel, onStateChange } from './shared/state.js';
 
-if (channel) {
-  channel.onmessage = (e) => {
-    if (e.data.type === 'STATE_UPDATE') {
-      const page = document.querySelector('.page.active');
-      if (page && page.id === 'page-auction') {
-        renderAuction();
-        window.populateBidTeamSelect();
-      }
-    }
-  };
-}
-
-// Poll fallback
-setInterval(() => {
+function refreshAuctionIfActive() {
   const page = document.querySelector('.page.active');
   if (page && page.id === 'page-auction') {
     renderAuction();
     window.populateBidTeamSelect();
   }
-}, 1500);
+}
+
+if (channel) {
+  channel.addEventListener('message', (e) => {
+    if (e.data.type === 'STATE_UPDATE') refreshAuctionIfActive();
+  });
+}
+
+// Fires whenever state changes locally OR is pulled from the server
+// (i.e. a team bidding from another device shows up here too).
+onStateChange(refreshAuctionIfActive);
+

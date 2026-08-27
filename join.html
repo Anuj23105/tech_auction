@@ -6,8 +6,14 @@
   <title>Join – Smart City Auction</title>
   <link rel="stylesheet" href="style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-  <!-- QR code library (loads from CDN) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- QR code library: local copy first so it works with no internet
+       (e.g. on a phone hotspot with mobile data off), CDN as fallback. -->
+  <script src="vendor/qrcode.min.js"></script>
+  <script>
+    if (typeof QRCode === 'undefined') {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>');
+    }
+  </script>
   <style>
     body { background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; font-family: 'Rajdhani', sans-serif; color: var(--text); }
     h1 { font-family: 'Orbitron', sans-serif; color: var(--accent); font-size: 1.8rem; margin-bottom: .3rem; text-align: center; }
@@ -44,8 +50,10 @@
 
   <button class="refresh-btn" onclick="location.reload()">🔄 Refresh</button>
 
-  <script src="shared.js"></script>
-  <script>
+  <script type="module">
+    import { getState } from './src/shared/state.js';
+    import { formatL, sanitize } from './src/shared/utils.js';
+
     // Detect current server URL
     const base = location.origin + location.pathname.replace('join.html', '');
     document.getElementById('serverUrl').textContent = base;
@@ -72,15 +80,25 @@
         `;
         container.appendChild(card);
 
-        // Generate QR
+        // Generate QR (falls back to showing the URL if the library failed to load)
         setTimeout(() => {
-          new QRCode(document.getElementById('qr-' + sanitize(t.name)), {
-            text: url,
-            width: 160,
-            height: 160,
-            colorDark: '#000000',
-            colorLight: '#ffffff',
-          });
+          const box = document.getElementById('qr-' + sanitize(t.name));
+          if (!box) return;
+          if (typeof QRCode === 'undefined') {
+            box.innerHTML = '<p style="color:#000;font-size:.8rem;padding:.5rem;">QR unavailable offline — type the URL below</p>';
+            return;
+          }
+          try {
+            new QRCode(box, {
+              text: url,
+              width: 160,
+              height: 160,
+              colorDark: '#000000',
+              colorLight: '#ffffff',
+            });
+          } catch (err) {
+            box.innerHTML = '<p style="color:#000;font-size:.8rem;padding:.5rem;">QR failed — type the URL below</p>';
+          }
         }, 50);
       });
     }
