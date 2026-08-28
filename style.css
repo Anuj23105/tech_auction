@@ -272,3 +272,19 @@ html, body { height: 100%; font-family: 'Rajdhani', sans-serif; background: var(
 .refresh-btn { background:none; border:1px solid var(--border); color:var(--muted); padding:.5rem 1.2rem; border-radius:8px; cursor:pointer; font-family:'Rajdhani',sans-serif; }
 .refresh-btn:hover { border-color:var(--accent); color:var(--accent); }
 .no-teams { color:var(--muted); font-size:.95rem; padding:1rem; text-align:center; }
+
+/* ===== AUCTION: pinned bid controls in the teams column =====
+   The teams grid scrolls on its own so the City Planning button and the
+   Admin Override Bid panel below it stay visible without scrolling. */
+.teams-panel { overflow: hidden; }
+.teams-panel > .teams-grid { flex: 1 1 auto; min-height: 0; overflow-y: auto; align-content: start; padding-right: .25rem; }
+.teams-panel-bottom { flex: 0 0 auto; display: flex; flex-direction: column; gap: .8rem; padding-top: .8rem; border-top: 1px solid var(--border); }
+.teams-panel-bottom .btn-finish-auction { margin-top: 0; }
+
+/* On narrow screens the columns stack, so let everything flow naturally
+   instead of trapping the grid in a short scroll area. */
+@media (max-width: 780px) {
+  .teams-panel { overflow: visible; }
+  .teams-panel > .teams-grid { overflow-y: visible; min-height: auto; flex: none; }
+  .teams-panel-bottom { border-top: none; }
+}

@@ -44,8 +44,11 @@
 
   <div class="note">
     <strong>How to use:</strong><br/>
-    Make sure all devices are on the same WiFi network.<br/>
-    Each team scans their QR code or types the URL into any browser.
+    Make sure all devices are on the same WiFi network or hotspot.<br/>
+    Each team scans their QR code or types the URL into any browser.<br/><br/>
+    The address above is your machine's network address, not <code>localhost</code>.
+    A <code>localhost</code> link only works on this machine — on a phone it means
+    the phone itself, so it will refuse to connect.
   </div>
 
   <button class="refresh-btn" onclick="location.reload()">🔄 Refresh</button>
@@ -54,9 +57,41 @@
     import { getState } from './src/shared/state.js';
     import { formatL, sanitize } from './src/shared/utils.js';
 
-    // Detect current server URL
-    const base = location.origin + location.pathname.replace('join.html', '');
-    document.getElementById('serverUrl').textContent = base;
+    const dir = location.pathname.replace('join.html', '');
+
+    // The host often opens this page as localhost, but "localhost" means
+    // "this device" — so QR codes built from location.origin would refuse to
+    // connect on every participant's phone. Ask the server for its real LAN
+    // address instead, and only fall back to location.origin if that fails.
+    let base = location.origin + dir;
+
+    async function resolveBase() {
+      const onLocalhost = ['localhost', '127.0.0.1', '::1', ''].includes(location.hostname);
+      try {
+        const res = await fetch('/api/network-info', { cache: 'no-store' });
+        if (!res.ok) throw new Error('bad response');
+        const { port, ips } = await res.json();
+        const lan = (ips || []).find(i => !i.likelyVirtual);
+        if (lan) {
+          base = `http://${lan.address}:${port}${dir}`;
+          document.getElementById('serverUrl').textContent = base;
+          return;
+        }
+        if (onLocalhost) {
+          document.getElementById('serverUrl').innerHTML =
+            '⚠️ No network adapter found — connect to WiFi or a hotspot first';
+          return;
+        }
+      } catch {
+        if (onLocalhost) {
+          document.getElementById('serverUrl').innerHTML =
+            '⚠️ Could not detect the LAN address. Do not share a localhost link — ' +
+            'participants cannot reach it.';
+          return;
+        }
+      }
+      document.getElementById('serverUrl').textContent = base;
+    }
 
     function renderQRCodes() {
       const s = getState();
@@ -103,12 +138,15 @@
       });
     }
 
+    // Resolve the shareable address BEFORE drawing any QR codes, so we never
+    // render a localhost link that participants can't reach.
+    await resolveBase();
     renderQRCodes();
 
     // Listen for game start
     if (typeof BroadcastChannel !== 'undefined') {
       const ch = new BroadcastChannel('smartcity');
-      ch.onmessage = () => renderQRCodes();
+      ch.addEventListener('message', () => renderQRCodes());
     }
     setInterval(renderQRCodes, 3000);
   </script>

@@ -166,23 +166,6 @@
           </div>
         </div>
 
-        <!-- Admin override bid -->
-        <div class="bid-controls">
-          <div class="admin-bid-label">🎛️ Admin Override Bid</div>
-          <select id="bidTeamSelect" class="team-select"></select>
-          <div class="bid-amount-row">
-            <button class="bid-step" onclick="adjustBid(-10)">−</button>
-            <input type="number" id="bidAmount" value="40" min="0" step="10"/>
-            <span class="bid-unit">Lakhs</span>
-            <button class="bid-step" onclick="adjustBid(10)">+</button>
-          </div>
-          <div class="bid-btn-row">
-            <button class="btn-bid"  onclick="placeBid()">🔨 Bid</button>
-            <button class="btn-sold" onclick="sellItem()">✅ SOLD!</button>
-            <button class="btn-skip" onclick="skipItem()">⏭ Skip</button>
-          </div>
-        </div>
-
         <div class="auction-nav" style="margin-top:.5rem;">
           <button class="btn-secondary" onclick="prevItem()">◀ Prev</button>
           <button class="btn-primary"   onclick="nextItem()">Next ▶</button>
@@ -196,7 +179,29 @@
           <div id="team-launch-btns" class="team-launch-row"></div>
         </div>
         <div id="teamsGrid" class="teams-grid"></div>
-        <button class="btn-finish-auction" onclick="goTo('page-city')">🗺️ City Planning →</button>
+
+        <!-- Pinned so the bid controls stay reachable without scrolling,
+             however many teams are in the grid above. -->
+        <div class="teams-panel-bottom">
+          <button class="btn-finish-auction" onclick="goTo('page-city')">🗺️ City Planning →</button>
+
+          <!-- Admin override bid -->
+          <div class="bid-controls">
+            <div class="admin-bid-label">🎛️ Admin Override Bid</div>
+            <select id="bidTeamSelect" class="team-select"></select>
+            <div class="bid-amount-row">
+              <button class="bid-step" onclick="adjustBid(-10)">−</button>
+              <input type="number" id="bidAmount" value="40" min="0" step="10"/>
+              <span class="bid-unit">Lakhs</span>
+              <button class="bid-step" onclick="adjustBid(10)">+</button>
+            </div>
+            <div class="bid-btn-row">
+              <button class="btn-bid"  onclick="placeBid()">🔨 Bid</button>
+              <button class="btn-sold" onclick="sellItem()">✅ SOLD!</button>
+              <button class="btn-skip" onclick="skipItem()">⏭ Skip</button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- RIGHT: Bid Log -->
