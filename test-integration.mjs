@@ -76,12 +76,45 @@ t('no single item costs more than a full 10Cr budget',
   AUCTION_ITEMS.every(i => i.base <= 1000));
 
 console.log('\n=== 7. SERVER API ===');
-const res = await fetch(`${BASE}/api/network-info`).catch(() => null);
-if (!res) { console.log('  SKIP  server not running on :3000'); }
-else {
-  const info = await res.json();
+
+// Bring the server up ourselves if it isn't already running, so this suite is
+// self-contained in CI. Never silently skip: an unreachable server used to make
+// the whole server/security/asset section vanish while still exiting 0.
+const ping = () => fetch(`${BASE}/api/network-info`).then(r => r.ok).catch(() => false);
+
+let spawned = null;
+if (!(await ping())) {
+  const { spawn } = await import('child_process');
+  console.log('  ...server not running, starting it for this test run');
+  spawned = spawn(process.execPath, ['server.js'], { stdio: 'ignore', detached: false });
+  const deadline = Date.now() + 15000;
+  while (Date.now() < deadline && !(await ping())) {
+    await new Promise(r => setTimeout(r, 300));
+  }
+}
+
+if (!(await ping())) {
+  console.log('  FAIL  server did not become reachable on :3000');
+  if (spawned) spawned.kill();
+  console.log('\n=== RESULT: aborted, server unavailable ===\n');
+  process.exit(1);
+}
+
+const stopSpawned = () => { if (spawned) { try { spawned.kill(); } catch { /* already gone */ } } };
+process.on('exit', stopSpawned);
+
+{
+  const info = await (await fetch(`${BASE}/api/network-info`)).json();
   t('/api/network-info returns port + ips', info.port === 3000 && Array.isArray(info.ips));
-  t('at least one non-virtual adapter detected', info.ips.some(i => !i.likelyVirtual));
+  t('every adapter entry is well-formed',
+    info.ips.every(i => typeof i.address === 'string' && typeof i.name === 'string'
+      && typeof i.likelyVirtual === 'boolean'));
+  // CI runners often only expose a Docker-range address, which we correctly
+  // classify as virtual — so this is informational, not a pass/fail condition.
+  const shareable = info.ips.filter(i => !i.likelyVirtual);
+  console.log(shareable.length
+    ? `        shareable address: http://${shareable[0].address}:${info.port}`
+    : '        (no shareable LAN address here — expected on a CI runner)');
 
   // state round trip
   const sample = {

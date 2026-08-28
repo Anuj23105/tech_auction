@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "node server.js",
     "start": "node server.js",
-    "test": "node test-integration.mjs"
+    "check": "node check-wiring.mjs",
+    "test": "node test-integration.mjs",
+    "ci": "npm run check && npm test"
   },
   "keywords": ["game", "auction", "smart-city"],
   "author": "",

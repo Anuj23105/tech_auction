@@ -1,0 +1,87 @@
+name: Release
+
+# There is no server to deploy to: this game runs on the host laptop at the
+# venue over the local network. So "release" means producing a self-contained
+# bundle the host can download, unzip, and run with `npm start`.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Never ship a bundle that hasn't passed its own checks.
+      - name: Verify before packaging
+        run: npm run ci
+
+      - name: Build bundle
+        id: bundle
+        run: |
+          version="${GITHUB_REF_NAME:-dev}"
+          name="smart-city-auction-${version}"
+          mkdir -p "dist/${name}"
+          # Ship only what's needed to run the game.
+          cp -r index.html team.html join.html style.css team.css \
+                package.json server.js src vendor README.md "dist/${name}/"
+          cd dist
+          zip -r "${name}.zip" "${name}" > /dev/null
+          echo "name=${name}" >> "$GITHUB_OUTPUT"
+          ls -la
+
+      - name: Smoke-test the bundle in isolation
+        run: |
+          cd "dist/${{ steps.bundle.outputs.name }}"
+          node server.js &
+          pid=$!
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:3000/api/network-info > /dev/null 2>&1; then break; fi
+            sleep 0.5
+          done
+          fail=0
+          for path in / /team.html /join.html /style.css /vendor/qrcode.min.js /src/index.js; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "http://localhost:3000${path}")
+            echo "  ${path} -> ${code}"
+            [ "$code" = "200" ] || fail=1
+          done
+          kill $pid
+          if [ "$fail" != "0" ]; then
+            echo "::error::Packaged bundle failed to serve one or more files."
+            exit 1
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.bundle.outputs.name }}
+          path: dist/${{ steps.bundle.outputs.name }}.zip
+          if-no-files-found: error
+
+      - name: Attach to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/${{ steps.bundle.outputs.name }}.zip
+          generate_release_notes: true
+          body: |
+            Download the zip below, unzip it, then run:
+
+            ```
+            npm start
+            ```
+
+            Open the printed network address on the host machine, click
+            **Connection Info** to get the link to share with participants.
+
+            Note: this runs on a local network only and has no authentication.
+            Do not expose it to the public internet.

@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  verify:
+    name: verify (node ${{ matrix.node }} / ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Windows is included deliberately: the game is hosted from a Windows
+        # laptop at the venue, so that path needs to stay green.
+        os: [ubuntu-latest, windows-latest]
+        node: ['20', '22']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      # No install step: this project intentionally has zero npm dependencies,
+      # so there is nothing to restore and no lockfile to audit.
+      - name: Confirm no dependencies crept in
+        shell: bash
+        run: |
+          deps=$(node -e "const p=require('./package.json');console.log(Object.keys({...p.dependencies,...p.devDependencies}).length)")
+          echo "declared dependencies: $deps"
+          if [ "$deps" != "0" ]; then
+            echo "::error::Dependencies were added. Update CI to install them, or keep the project dependency-free."
+            exit 1
+          fi
+
+      - name: Static checks (parse + DOM wiring)
+        run: npm run check
+
+      - name: Integration tests
+        run: npm test
+
+  summary:
+    name: CI passed
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "All verify jobs passed."
